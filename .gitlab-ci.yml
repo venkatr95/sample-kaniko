@@ -1,0 +1,19 @@
+stages:
+  - build
+
+variables:
+  # Define your Docker image name and registry here
+  DOCKER_IMAGE_NAME: my-cpp-app
+  DOCKER_REGISTRY: registry.example.com/my-docker-repo
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHA
+  only:
+    - master  # You can specify which branches trigger this job
