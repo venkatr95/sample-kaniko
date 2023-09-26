@@ -4,7 +4,8 @@ stages:
 variables:
   # Define your Docker image name and registry here
   DOCKER_IMAGE_NAME: my-cpp-app
-  DOCKER_REGISTRY: registry.example.com/my-docker-repo
+  DOCKER_USERNAME: ${DOCKER_USERNAME}
+  DOCKER_PASSWORD: ${DOCKER_PASSWORD}
 
 build:
   stage: build
@@ -13,7 +14,8 @@ build:
     entrypoint: [""]
   script:
     - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHA
+    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHA
   only:
-    - master  # You can specify which branches trigger this job
+    - main  # You can specify which branches trigger this job
+
